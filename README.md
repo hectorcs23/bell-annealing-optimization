@@ -4,7 +4,7 @@
 
 ![Synthetic illustration of the coil temperature field and the cold-spot lag](docs/img/coil_field.png)
 
-> It started as the final project of my *Statistical Thermodynamics* course (Tec de Monterrey), built with Alfredo Almaguer and Jorge Alejandro Soules Velasco. The project won **first place** and led to an internship offer at **Ternium** (Monterrey, 2026), where I kept developing the simulator into a production tool and built the load optimizer. Both tools were used in the plant.
+> It started as the final project of my *Statistical Thermodynamics* course (Tec de Monterrey). The project won **first place** and led to an internship offer at **Ternium** (Monterrey, 2026), where I kept developing the simulator into a production tool and built the load optimizer. Both tools were used in the plant.
 >
 > **This page is a high-level description only.** Source code, plant data, recipes, equipment drawings and calibration results are Ternium's and are not published. Every figure here was generated from scratch for this page using textbook material properties and invented geometry, and is labelled as such.
 
@@ -72,9 +72,9 @@ With realistic gaps, heat moves several times faster along the axis than across 
 | Predicted yield strength, hardness and elongation vs measured | **within 10 %**, meeting the quality standard |
 | Load optimizer, production trials | measured **increase in weekly production**, with better load weight and height utilization |
 
-The original course simulator only predicted the temperature difference across a coil. Once I was working with the process, the more useful question for production turned out to be a different one: **how does the annealing cycle change the properties of the finished steel?** That is why the recrystallization and property layers were added. Together with Diana Morales Vázquez, we correlated annealing cycles with measured mechanical properties, which is what made it possible to shorten cycles in trials without leaving the quality window.
+The original course simulator only predicted the temperature difference across a coil. Once I was working with the process, the more useful question for production turned out to be a different one: **how does the annealing cycle change the properties of the finished steel?** That is why the recrystallization and property layers were added. Correlating annealing cycles with measured mechanical properties is what made it possible to shorten cycles in trials without leaving the quality window.
 
-The optimizer was integrated into Ternium's systems together with the plant automation team.
+The optimizer was integrated into Ternium's plant systems.
 
 ## Honest limitations
 
