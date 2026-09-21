@@ -4,7 +4,7 @@
 
 ![Synthetic illustration of the coil temperature field and the cold-spot lag](docs/img/coil_field.png)
 
-> Built during my internship as a process trainee in cold-rolling operations at **Ternium** (Monterrey, 2026). Both tools were deployed and used in the plant.
+> It started as the final project of my *Statistical Thermodynamics* course (Tec de Monterrey), built with Alfredo Almaguer and Jorge Alejandro Soules Velasco. The project won **first place** and led to an internship offer at **Ternium** (Monterrey, 2026), where I kept developing the simulator into a production tool and built the load optimizer. Both tools were used in the plant.
 >
 > **This page is a high-level description only.** Source code, plant data, recipes, equipment drawings and calibration results are Ternium's and are not published. Every figure here was generated from scratch for this page using textbook material properties and invented geometry, and is labelled as such.
 
@@ -29,7 +29,7 @@ flowchart LR
 
 Grouping coils into loads is a **bin-packing problem** (NP-hard) with extra structure: height including spacers, total weight, outer-diameter compatibility between stacked coils, recipe and route compatibility, and the number of crane moves needed to dig each coil out of the storage yard.
 
-- **Algorithms.** Greedy first-fit-decreasing as a baseline, improved with **simulated annealing** and **large-neighborhood search**, and a **best-load-first** heuristic with an exhaustive search over load density. An ILP formulation (OR-Tools / CBC) served as a reference to check how far from optimal the heuristics were.
+- **Algorithms.** Because the number of combinations is huge and the constraints are operational rather than textbook, the solution is metaheuristic. Greedy first-fit-decreasing as a baseline, improved with **simulated annealing** (fittingly, for an annealing plant) and **large-neighborhood search**, and a **best-load-first** heuristic with an exhaustive search over load density. An ILP formulation (OR-Tools / CBC) served as a reference to check how far from optimal the heuristics were.
 - **Choosing an objective.** All methods reached the same minimum number of loads. What separated them was *where the leftover capacity ends up*. Best-load-first concentrates the slack into one large, reusable gap instead of spreading it thinly across every load. In practice that gap can be filled by the next production coils, so it was chosen as the default even though it scores the same on the textbook objective.
 - **Delivery.** Two independent implementations, a Python desktop app and a single-file offline web app, cross-validated to give identical results on the same input.
 
@@ -61,13 +61,20 @@ With realistic gaps, heat moves several times faster along the axis than across 
 
 **From field to decision.** The gradient between hot spot and cold spot rises during the ramp, peaks, then relaxes during the soak. The recommended cut time is the first moment *after the peak* at which that gradient falls below a threshold. It is evaluated on a counterfactual run with the soak extended, so that cooling cannot make the criterion fire for the wrong reason.
 
-**Metallurgy on top.** The simulated thermal history of the cold spot drives a JMAK recrystallization model and an empirical model for yield strength and elongation. Each load therefore gets a predicted property outcome as well as a cut time. The thermal model was calibrated and validated on held-out furnace charges before being used for decisions.
+**Metallurgy on top.** The simulated thermal history of the cold spot drives a JMAK recrystallization model and an empirical model for the yield strength, hardness and elongation of commercial low-carbon steel. Each load therefore gets a predicted property outcome as well as a cut time. The thermal model follows the batch-annealing approach of Sahay et al. (2004) and was validated against reference thermocouple measurements before being used for decisions.
 
-## What it was used for
+## Results
 
-- Building loads from the coil inventory with fewer wasted slots and fewer crane moves.
-- Checking, load by load, whether a recipe was longer than the physics requires, and flagging loads where shortening it would put the cold spot at risk.
-- Designing a plant trial matrix to test shorter cycles, with predicted properties for each trial coil.
+| | |
+|---|---|
+| Cold-spot temperature vs reference thermocouple measurements | **RMSE 12.6 °C** |
+| Annealing cycle for thicker coils, production trials | **8 % shorter** |
+| Predicted yield strength, hardness and elongation vs measured | **within 10 %**, meeting the quality standard |
+| Load optimizer, production trials | measured **increase in weekly production**, with better load weight and height utilization |
+
+The original course simulator only predicted the temperature difference across a coil. Once I was working with the process, the more useful question for production turned out to be a different one: **how does the annealing cycle change the properties of the finished steel?** That is why the recrystallization and property layers were added. Together with Diana Morales Vázquez, we correlated annealing cycles with measured mechanical properties, which is what made it possible to shorten cycles in trials without leaving the quality window.
+
+The optimizer was integrated into Ternium's systems together with the plant automation team.
 
 ## Honest limitations
 
