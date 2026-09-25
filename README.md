@@ -2,7 +2,7 @@
 
 **Two connected tools for batch annealing of cold-rolled steel coils.** The first decides which coils go into each furnace load; the second simulates how each load heats up inside the furnace, so the heating cycle can be ended when the slowest point of the load is actually done rather than when a fixed recipe says so.
 
-![Synthetic illustration of the coil temperature field and the cold-spot lag](docs/img/coil_field.png)
+![Synthetic example: furnace gas, hot spot and cold spot during a heating cycle](docs/img/coil_field.png)
 
 > It started as the final project of my *Statistical Thermodynamics* course (Tec de Monterrey). The project won **first place** and led to an internship offer at **Ternium** (Monterrey, 2026), where I kept developing the simulator into a production tool and built the load optimizer. Both tools were used in the plant.
 >
@@ -53,13 +53,18 @@ is solved by conservative finite volumes with Robin (convective and radiative) c
 \lambda_r = \frac{d_s + d_g}{\dfrac{d_s}{k_s(T)} + \dfrac{d_g}{k_{gap}(T)}}, \qquad \lambda_z \approx k_s(T)
 ```
 
-![Homogenized conductivity and anisotropy, textbook properties](docs/img/homogenised_conductivity.png)
+<p align="center">
+<img src="docs/img/homogenised_conductivity.png" width="420" alt="Homogenized axial and radial conductivity, textbook properties">
+<img src="docs/img/anisotropy.png" width="420" alt="Anisotropy between axial and radial conduction, textbook properties">
+</p>
 
 With realistic gaps, heat moves several times faster along the axis than across the turns. **That anisotropy is what creates a cold spot at all.** A model that treats the coil as solid steel predicts an almost uniform coil and misses the question entirely.
 
 **The thermocouple as an observer.** The plant's control thermocouple does not sit in the coil. It is modelled as a first-order lag driven by a blend of metal and gas temperature, with its time constant and blend weight fitted to historical furnace charges. This connects the simulation to what operators see on their screen, without pretending the thermocouple measures the coil interior.
 
 **From field to decision.** The gradient between hot spot and cold spot rises during the ramp, peaks, then relaxes during the soak. The recommended cut time is the first moment *after the peak* at which that gradient falls below a threshold. It is evaluated on a counterfactual run with the soak extended, so that cooling cannot make the criterion fire for the wrong reason.
+
+![Synthetic example: gradient across the coil, its peak and the recommended cut](docs/img/coil_gradient.png)
 
 **Metallurgy on top.** The simulated thermal history of the cold spot drives a JMAK recrystallization model and an empirical model for the yield strength, hardness and elongation of commercial low-carbon steel. Each load therefore gets a predicted property outcome as well as a cut time. The thermal model follows the batch-annealing approach of Sahay et al. (2004) and was validated against reference thermocouple measurements before being used for decisions.
 
